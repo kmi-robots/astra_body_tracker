@@ -1,36 +1,36 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(astra_body_tracker)
-
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  geometry_msgs
-  visualization_msgs
-  body_tracker_msgs
-  std_msgs
-)
+        roscpp
+        geometry_msgs
+        visualization_msgs
+        body_tracker_msgs
+        tf2
+        tf2_ros
+        message_generation
+        )
 
-set(CMAKE_MODULE_PATH "/home/system/AstraSDK/samples/cmake/")
+set(CMAKE_MODULE_PATH "/home/rubik/AstraSDK/samples/cmake/")
 #list(APPEND CMAKE_MODULE_PATH "/home/system/AstraSDK/samples/cmake/")
-set(ASTRA_SAMPLES_COMMON_DIR "/home/system/AstraSDK/samples/common/")
+set(ASTRA_SAMPLES_COMMON_DIR "/home/rubik/AstraSDK/samples/common/")
 
-MESSAGE( STATUS "AFTER:" )
-foreach(path ${CMAKE_MODULE_PATH})
-  message("     Path = " ${path})
-endforeach(path)
+MESSAGE(STATUS "AFTER:")
+foreach (path ${CMAKE_MODULE_PATH})
+    message("     Path = " ${path})
+endforeach (path)
 
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Astra REQUIRED)
 
-MESSAGE( STATUS "CMAKE_MODULE_PATH:         " ${CMAKE_MODULE_PATH} )
-MESSAGE( STATUS "ASTRA_SAMPLES_COMMON_DIR:  " ${ASTRA_SAMPLES_COMMON_DIR} )
+MESSAGE(STATUS "CMAKE_MODULE_PATH:         " ${CMAKE_MODULE_PATH})
+MESSAGE(STATUS "ASTRA_SAMPLES_COMMON_DIR:  " ${ASTRA_SAMPLES_COMMON_DIR})
 #set_target_properties(${_projname} PROPERTIES FOLDER "${SAMPLE_DIR_FOLDER}c-api")
 
 
@@ -64,10 +64,10 @@ MESSAGE( STATUS "ASTRA_SAMPLES_COMMON_DIR:  " ${ASTRA_SAMPLES_COMMON_DIR} )
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-#add_message_files(
-#  FILES
-#  BodyInfo.msg
-#)
+add_message_files(
+  FILES
+  BodyListStamped.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -84,11 +84,10 @@ MESSAGE( STATUS "ASTRA_SAMPLES_COMMON_DIR:  " ${ASTRA_SAMPLES_COMMON_DIR} )
 # )
 
 ## Generate added messages and services with any dependencies listed here
-#generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   geometry_msgs
-#)
+generate_messages(
+   DEPENDENCIES
+   std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -121,10 +120,10 @@ MESSAGE( STATUS "ASTRA_SAMPLES_COMMON_DIR:  " ${ASTRA_SAMPLES_COMMON_DIR} )
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES astra_body_tracker
-  CATKIN_DEPENDS roscpp std_msgs body_tracker_msgs
-#  DEPENDS system_lib
+        #  INCLUDE_DIRS include
+        #  LIBRARIES astra_body_tracker
+        CATKIN_DEPENDS roscpp std_msgs body_tracker_msgs message_runtime
+        #  DEPENDS system_lib
 )
 
 ###########
@@ -134,12 +133,12 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-#  /home/system/AstraSDK/samples/cmake/astra/capi
-  ${ASTRA_INCLUDE_DIR}
-  ${ASTRA_INCLUDE_DIR}/astra/capi
-  ${ASTRA_SAMPLES_COMMON_DIR}
-  ${catkin_INCLUDE_DIRS}
+        # include
+        #  /home/system/AstraSDK/samples/cmake/astra/capi
+        ${ASTRA_INCLUDE_DIR}
+        ${ASTRA_INCLUDE_DIR}/astra/capi
+        ${ASTRA_SAMPLES_COMMON_DIR}
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -156,6 +155,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/astra_body_tracker_node.cpp)
+add_executable(astra_cpp_body_tracker_node src/astra_cpp_body_tracker_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -166,12 +166,17 @@ add_executable(${PROJECT_NAME}_node src/astra_body_tracker_node.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(astra_cpp_body_tracker_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
-   ${ASTRA_LIBRARIES}
-   ${catkin_LIBRARIES}
-)
+        ${ASTRA_LIBRARIES}
+        ${catkin_LIBRARIES}
+        )
+
+target_link_libraries(astra_cpp_body_tracker_node
+        ${ASTRA_LIBRARIES}
+        ${catkin_LIBRARIES})
 
 #############
 ## Install ##
